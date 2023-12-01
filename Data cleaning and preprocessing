@@ -1,0 +1,76 @@
+#!/bin/bash
+#SBATCH -t 00-03:00:00
+#SBATCH --mem=16000
+#SBATCH -c 3
+
+#SBATCH --mail-user=XXX.lanchec@usherbrooke.ca
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=REQUEUE
+#SBATCH --mail-type=ALL
+
+module load StdEnv/2020
+module load gcc/9.3.0
+module load sra-toolkit/3.0.0
+module load fastqc/0.11.9
+module load java/13.0.2
+module load trimmomatic/0.39
+module load python/3.8.10
+module load kb-python
+source RNA/bin/activate
+
+
+cd /home/XXX/SLURM
+
+##OPEN SRA
+for file in /home/XXX/scratch/SRA/*
+do
+    fasterq-dump --split-files --outdir /home/XXX/scratch/Fastq/ $file
+    gzip /home/XXX/scratch/Fastq/*
+done
+
+##CHECK QUALITY
+cd /home/XXX/scratch/Fastq
+fastqc --outdir /home/XXX/scratch/Quality *.fastq.gz
+
+##RECONSTRUCT COMPLEMENTARY STRAND AND TRIM
+cd /home/XXX/scratch/Fastq
+for file in *_1.fastq.gz
+do
+    base=$(basename ${file} _1.fastq.gz)
+    java -jar $EBROOTTRIMMOMATIC/trimmomatic-0.39.jar \
+    PE \
+    -threads 3 \
+    ${file} ${base}_2.fastq.gz \
+    ${base}_1.trim.fastq.gz ${base}_1unp.trim.fastq.gz \
+    ${base}_2.trim.fastq.gz ${base}_2unp.trim.fastq.gz \
+    SLIDINGWINDOW:4:20 MINLEN:115
+done
+
+mv *unp.trim.fastq.gz /home/XXX/scratch/UnpTrimmed
+mv *.trim.fastq.gz /home/XXX/scratch/Trimmed
+
+## GET REFERENCE GENES
+cd /home/XXX/scratch/GenomeRef/homo_sapiens
+wget ftp://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+wget ftp://ftp.ensembl.org/pub/release-109/gtf/homo_sapiens/Homo_sapiens.GRCh38.109.gtf.gz
+
+kb ref -i index.idx -g t2g.txt -f1 transcriptome.fa Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz Homo_sapiens.GRCh38.109.gtf.gz
+
+#kb --list
+
+## ID TRANSCRIPTS
+cd /home/XXX/scratch/Trimmed
+for file in *_1.trim.fastq.gz
+do
+    base=$(basename ${file} _1.trim.fastq.gz)
+    kb  count \
+    -i /home/XXX/scratch/GenomeRef/homo_sapiens/index.idx \
+    -g /home/XXX/scratch/GenomeRef/homo_sapiens/t2g.txt \
+    -o /home/XXX/scratch/Quant/${base}/ \
+    -x 10xv3 \
+    ${file} ${base}_2.trim.fastq.gz 
+done
+
+
