@@ -90,7 +90,7 @@ del (adata,file,lower_lim,upper_lim) #,adata_sim
 #MANUAL CLUSTER
 for file in out :
     with rc_context({'figure.figsize': (4, 4)}):
-        sc.pl.umap(file, color = ['leiden'], frameon = False, title = str(file.obs['Sample'][0])) # , legend_loc = None)
+        sc.pl.umap(file, color = ['leiden'], frameon = False, title = str("Orphan GPCR in pancreatic adenocarcinome")) # , legend_loc = None)
 
 #PLOT
 markers_Orphan = ["GPR3","GPR4","GPR6","GPR12","GPR15","GPR17","GPR20","GPR22","PR26",
@@ -99,11 +99,6 @@ markers_Orphan = ["GPR3","GPR4","GPR6","GPR12","GPR15","GPR17","GPR20","GPR22","
            "GPR183","LGR4","LGR5","LGR6","MAS1","MRGPRD","MRGPRX1","MRGPRX2",
            "P2RY10","TAAR2","GPR156", "GPR158", "GPR179", "GPRC5A", "GPRC5B",
            "GPRC5C", "GPRC5D", "GPRC6" ]
-markers_Adhesion = ["ADGRA1","ADGRA2","ADGRA3","ADGRB1","ADGRB2","ADGRB3","CELSR1","CELSR2"
-           "CELSR3","ADGRD1","ADGRD2","ADGRE1","ADGRE2","ADGRE3","ADGRE4P","ADGRE5"
-           "ADGRF1","ADGRF2P","ADGRF3","ADGRF4","ADGRF5","ADGRG1","ADGRG2","ADGRG3" 
-           "ADGRG4","ADGRG5","ADGRG6","ADGRG7","ADGRL1","ADGRL2","ADGRL3","ADGRL4","ADGRV1"]
-
 
 for file in out :
     list_gene_Orphan= []
@@ -115,15 +110,7 @@ for file in out :
             list_gene_Orphan.append(genes)      
     sc.pl.dotplot(file,list_gene_Orphan ,groupby=['orig.ident'], use_raw=False,
                   mean_only_expressed= True,standard_scale="var", vmax=1, vmin =0,
-                  title=("Orphan GPCR in "+str(file.obs['Sample'][0]))) 
-
-    for genes in markers_Adhesion : 
-        df = file.var_names
-        if genes in df :
-            list_gene_Adhesion.append(genes)      
-    sc.pl.dotplot(file,list_gene_Adhesion ,groupby=['orig.ident'], use_raw=False,
-                  mean_only_expressed= True,standard_scale="var", vmax=1, vmin =0,
-                  title=("Adhesion GPCR in "+str(file.obs['Sample'][0]))) 
+                  title=("Orphan GPCR in pancreatic adenocarcinome")) 
 
 #SAVE
 for file in out :
@@ -146,7 +133,7 @@ for file in out :
 #"scrJUQ059","scrJUQ068","scrJUQ070","scrJUQ072"])]
 
 #LOAD
-#out=[]
-#file = sc.read_h5ad("/home/XXX/Documents/Résultats/23-11-01_RNAseq/Process/Pancreatic_ductal_adenocarcinoma/Filtered_pancreatic_ductal_adenocarcinoma_PRJCA001063.h5ad").T
-#file = file.transpose()
-#out.append(file)
+out=[]
+file = sc.read_h5ad("/home/XXX/Documents/Résultats/23-11-01_RNAseq/Process/Pancreatic_ductal_adenocarcinoma/Filtered_pancreatic_ductal_adenocarcinoma_PRJCA001063.h5ad").T
+file = file.transpose()
+out.append(file)
