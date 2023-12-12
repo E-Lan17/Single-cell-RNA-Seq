@@ -20,7 +20,7 @@ for file in os.listdir('/home/XXX/Documents/Résultats/23-11-01_RNAseq/raw_count
 
     #PREFILTRE and ID
     sc.pp.filter_cells(adata, min_genes=200) #get rid of cells with fewer than 200 genes
-    sc.pp.filter_genes(adata, min_cells=10) #get rid of genes that are found in fewer than 3 cells
+    sc.pp.filter_genes(adata, min_cells=10) #get rid of genes that are found in fewer than 10 cells
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'  
     adata.var["ribo"] = adata.var_names.str.startswith(("RPS", "RPL")) # annotate the group of ribo genes as 'ribo'
     
@@ -102,7 +102,6 @@ markers_Orphan = ["GPR3","GPR4","GPR6","GPR12","GPR15","GPR17","GPR20","GPR22","
 
 for file in out :
     list_gene_Orphan= []
-    list_gene_Adhesion= []
     
     for genes in markers_Orphan : 
         df = file.var_names
