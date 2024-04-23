@@ -3,7 +3,7 @@
 #SBATCH --mem=16000
 #SBATCH -c 3
 
-#SBATCH --mail-user=XXX.lanchec@usherbrooke.ca
+#SBATCH --mail-user=XXX@ca
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
